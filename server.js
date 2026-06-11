@@ -10,6 +10,7 @@ const PORT        = process.env.PORT || 3000;
 const MAX_PAYLOAD = 4096;          // bytes per message
 const RATE_MAX    = 30;            // messages per second per client
 const ROOM_TTL    = 30 * 60_000;  // 30-minute room expiry
+const MAX_ROOMS   = 200;           // cap concurrent rooms to prevent memory DoS
 
 // ── HTTP server — serves index.html ─────────────────────────────────────────
 const htmlFile = path.join(__dirname, 'index.html');
@@ -25,10 +26,22 @@ const server = http.createServer((req, res) => {
       'X-Frame-Options': 'SAMEORIGIN',
       'Referrer-Policy': 'no-referrer',
       'Cache-Control': 'no-store',
-      // Uncomment for production HTTPS deployments:
-      // 'Strict-Transport-Security': 'max-age=31536000',
+      'Content-Security-Policy': [
+        "default-src 'none'",
+        "script-src 'unsafe-inline'",
+        "style-src 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src https://fonts.gstatic.com",
+        "connect-src 'self' ws: wss:",
+        "img-src 'self' data:",
+        "object-src 'none'",
+        "base-uri 'self'",
+      ].join('; '),
+      // Enabled on Railway (HTTPS); harmless to send over HTTP too
+      ...(process.env.RAILWAY_ENVIRONMENT
+        ? { 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains' }
+        : {}),
     });
-    res.end(data.toString().replace('__VERSION__', version));
+    res.end(data.toString().replace(/__VERSION__/g, version));
   });
 });
 
@@ -95,6 +108,7 @@ wss.on('connection', (ws /*, req */) => {
     // ── Pre-auth messages ──────────────────────────────────────────────────
     if (m.type === 'CREATE_ROOM') {
       if (player) return;
+      if (rooms.size >= MAX_ROOMS) { safeSend(ws, { type: 'ERROR', msg: 'Server full, try later' }); return; }
       const code  = genCode();
       const token = genToken();
       const name  = sanitize(m.name) || 'P1';
@@ -171,6 +185,7 @@ wss.on('connection', (ws /*, req */) => {
         if (!room.started) return;
         const amount     = clamp(m.amount, 1, 4);
         const targetSlot = clamp(m.targetSlot, 1, 4);
+        if (targetSlot === player.slot) return; // no self-targeting
         const target = room.players.find(p => p.slot === targetSlot && !p.dead);
         if (target) safeSend(target.ws, { type: 'GARBAGE', amount, fromSlot: player.slot });
         return;
