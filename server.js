@@ -4,6 +4,7 @@ const fs     = require('fs');
 const path   = require('path');
 const { WebSocketServer } = require('ws');
 const crypto = require('crypto');
+const { version } = require('./package.json');
 
 const PORT        = process.env.PORT || 3000;
 const MAX_PAYLOAD = 4096;          // bytes per message
@@ -27,7 +28,7 @@ const server = http.createServer((req, res) => {
       // Uncomment for production HTTPS deployments:
       // 'Strict-Transport-Security': 'max-age=31536000',
     });
-    res.end(data);
+    res.end(data.toString().replace('__VERSION__', version));
   });
 });
 

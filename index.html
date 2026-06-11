@@ -40,6 +40,7 @@ body{
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
 .panel-sub{font-size:9px;letter-spacing:4px;color:rgba(255,255,255,.35);text-align:center}
+.panel-version{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.18);text-align:center;margin-top:-6px}
 
 /* ── Inputs & buttons ─────────────────────────────────────── */
 .neon-input{
@@ -195,7 +196,8 @@ kbd{display:inline-block;min-width:22px;text-align:center;background:rgba(255,25
 <div id="s-lobby" class="screen">
   <div class="panel" id="lobby" style="max-width:380px">
     <div class="panel-title">NEON TETRIS</div>
-    <div class="panel-sub">ONLINE MULTIPLAYER · 2–4 PLAYERS</div>
+    <div class="panel-sub">ONLINE MULTIPLAYER · 1–4 PLAYERS</div>
+    <div class="panel-version">v__VERSION__</div>
     <input id="inp-name" class="neon-input" placeholder="YOUR NAME" maxlength="12" autocomplete="off">
     <input id="inp-server" class="neon-input" placeholder="ws://localhost:3000" autocomplete="off">
     <button class="neon-btn btn-cyan" id="btn-create">CREATE ROOM</button>

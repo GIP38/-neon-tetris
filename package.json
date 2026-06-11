@@ -1,6 +1,6 @@
 {
   "name": "neon-tetris-online",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Online 4-player Neon Tetris with WebSocket backend",
   "main": "server.js",
   "scripts": {
