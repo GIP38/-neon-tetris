@@ -134,7 +134,7 @@ wss.on('connection', (ws /*, req */) => {
       case 'START_GAME':
         if (player.slot !== 1) { safeSend(ws, { type: 'ERROR', msg: 'Only the host can start' }); return; }
         if (room.started) return;
-        if (room.players.length < 2) { safeSend(ws, { type: 'ERROR', msg: 'Need at least 2 players' }); return; }
+        if (room.players.length < 1) { safeSend(ws, { type: 'ERROR', msg: 'No players in room' }); return; }
         room.started = true;
         bcast(room, { type: 'GAME_STARTED', players: playerList(room) });
         return;

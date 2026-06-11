@@ -215,7 +215,7 @@ kbd{display:inline-block;min-width:22px;text-align:center;background:rgba(255,25
     </div>
     <div class="player-slots" id="player-slots"></div>
     <button class="neon-btn btn-cyan" id="btn-start">START GAME</button>
-    <div id="wait-hint" class="panel-sub">Need at least 2 players</div>
+    <div id="wait-hint" class="panel-sub">1–4 players — start when ready</div>
     <div class="err" id="wait-err"></div>
   </div>
 </div>
@@ -879,11 +879,11 @@ function updateWaitingUI(){
   }
   const isHost=mySlot===1;
   const startBtn=document.getElementById('btn-start');
-  startBtn.disabled=!isHost||count<2;
+  startBtn.disabled=!isHost;
   startBtn.style.display=isHost?'':'none';
   document.getElementById('wait-hint').textContent=
     !isHost?'Waiting for host to start…':
-    count<2?`Need at least 2 players (${count}/4 connected)`:`${count}/4 players ready`;
+    `${count}/4 players — start when ready`;
 }
 
 function showResults(rankings,winnerSlot){
