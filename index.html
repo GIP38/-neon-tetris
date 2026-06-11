@@ -94,8 +94,8 @@ body{
 #wait-hint{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.3);text-align:center}
 
 /* ── Game screen ──────────────────────────────────────────── */
-#s-game{align-items:flex-start;padding:10px}
-#game-ui{display:flex;gap:14px;align-items:flex-start;margin:auto}
+#s-game{align-items:center;justify-content:center;padding:0;overflow:hidden}
+#game-ui{display:flex;gap:14px;align-items:flex-start;flex-shrink:0}
 
 /* Left: your board */
 #game-left{display:flex;flex-direction:column;gap:4px}
@@ -112,7 +112,12 @@ body{
 .side-panel{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:48px}
 .mini-label{font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.3)}
 canvas{display:block;image-rendering:pixelated}
-#ctrl-hint{font-size:7px;letter-spacing:1.5px;color:rgba(255,255,255,.2);text-align:center;padding-top:2px}
+#controls-bar{display:flex;flex-wrap:wrap;gap:4px 10px;padding:7px 2px 3px;border-top:1px solid rgba(255,255,255,.07)}
+.cb-item{display:flex;align-items:center;gap:5px;font-size:8px;letter-spacing:1px;color:rgba(255,255,255,.38)}
+kbd{display:inline-block;min-width:22px;text-align:center;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.14);border-bottom:2px solid rgba(255,255,255,.22);
+  border-radius:3px;padding:2px 6px;font-family:'Orbitron',monospace;font-size:7px;
+  color:rgba(0,255,255,.75);letter-spacing:1px;white-space:nowrap}
 
 /* Countdown/disconnect overlay on board */
 #board-overlay{
@@ -243,7 +248,14 @@ canvas{display:block;image-rendering:pixelated}
           <canvas id="next-canvas" width="48" height="200"></canvas>
         </div>
       </div>
-      <div id="ctrl-hint">←/→ MOVE &nbsp; ↑ ROTATE &nbsp; ↓ SOFT &nbsp; SPACE HARD &nbsp; C HOLD &nbsp; Z CCW</div>
+      <div id="controls-bar">
+        <div class="cb-item"><kbd>← →</kbd><span>Move</span></div>
+        <div class="cb-item"><kbd>↑</kbd><span>Rotate CW</span></div>
+        <div class="cb-item"><kbd>Z</kbd><span>Rotate CCW</span></div>
+        <div class="cb-item"><kbd>↓</kbd><span>Soft drop</span></div>
+        <div class="cb-item"><kbd>SPACE</kbd><span>Hard drop</span></div>
+        <div class="cb-item"><kbd>C</kbd><span>Hold</span></div>
+      </div>
     </div>
 
     <!-- Right: scoreboard + opponent boards -->
@@ -830,9 +842,21 @@ function setupOppBoards(){
 
 // ── Screen / UI helpers ───────────────────────────────────────────────────────
 const SCREENS=['s-lobby','s-waiting','s-game','s-over'];
+
+const NAT_W=590, NAT_H=534;
+function scaleGame(){
+  const ui=document.getElementById('game-ui');
+  if(!ui)return;
+  const s=Math.min((window.innerWidth-16)/NAT_W,(window.innerHeight-16)/NAT_H);
+  ui.style.transform=`scale(${s.toFixed(4)})`;
+  ui.style.transformOrigin='center center';
+}
+window.addEventListener('resize',scaleGame);
+
 function showScreen(id){
   SCREENS.forEach(s=>document.getElementById(s).classList.toggle('hidden',s!==id));
   phase = id==='s-lobby'?'lobby': id==='s-waiting'?'waiting': id==='s-game'?phase: 'over';
+  if(id==='s-game') scaleGame();
 }
 
 const SLOT_DOTS={'1':'#00FFFF','2':'#FF00AA','3':'#00FF88','4':'#FF8800'};
